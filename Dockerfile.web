@@ -1,5 +1,21 @@
-FROM openjdk:11 as build
+FROM maven:3-jdk-11
+
+ADD . /demo2
+WORKDIR /demo2
+
+RUN ls -l
+
+# Run Maven build
+RUN mvn clean install
+
+FROM openjdk:11-jdk
 VOLUME /tmp
-ARG JAR_FILE
-COPY ${JAR_FILE} demo2.jar
-ENTRYPOINT ["java","-jar","demo2.jar"]
+#ARG JAR_FILE
+#COPY ${JAR_FILE} demo2.jar
+#ENTRYPOINT ["java","-jar","demo2.jar"]
+
+# Add Spring Boot app.jar to Container
+COPY --from=0 "/demo2/target/demo2-*-SNAPSHOT.jar" demo2.jar
+
+# Fire up our Spring Boot app by default
+CMD [ "sh", "-c", "java $JAVA_OPTS -XX:+UseContainerSupport -Djava.security.egd=file:/dev/./urandom -jar /demo2.jar" ]
