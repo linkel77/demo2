@@ -1,21 +1,19 @@
+#Primer container para maven
 FROM maven:3-jdk-11
 
+#Creamos Workspace
 ADD . /demo2
 WORKDIR /demo2
-
-RUN ls -l
 
 # Run Maven build
 RUN mvn clean install
 
+#Segundo container para la app
 FROM openjdk:11-jdk
 VOLUME /tmp
-#ARG JAR_FILE
-#COPY ${JAR_FILE} demo2.jar
-#ENTRYPOINT ["java","-jar","demo2.jar"]
 
-# Add Spring Boot app.jar to Container
+# Añadimos el container
 COPY --from=0 "/demo2/target/demo2-*-SNAPSHOT.jar" demo2.jar
 
-# Fire up our Spring Boot app by default
-CMD [ "sh", "-c", "java -Dserver.port=$PORT -Xmx300m -Xss512k -XX:CICompilerCount=2 -Dfile.encoding=UTF-8 -XX:+UseContainerSupport -Djava.security.egd=file:/dev/./urandom -jar /app.jar" ]
+#Lanzamos run con configuracion de puertos y de memoria para java
+CMD [ "sh", "-c", "java -Dserver.port=$PORT -Xmx300m -Xss512k -XX:CICompilerCount=2 -Dfile.encoding=UTF-8 -XX:+UseContainerSupport -Djava.security.egd=file:/dev/./urandom -jar /demo2.jar" ]
