@@ -1,5 +1,5 @@
 FROM openjdk:11 as build
 VOLUME /tmp
-ARG JAR_FILE
+ARG JAR_FILE=target/demo2.jar
 COPY ${JAR_FILE} demo2.jar
 ENTRYPOINT ["java","-jar","demo2.jar"]
